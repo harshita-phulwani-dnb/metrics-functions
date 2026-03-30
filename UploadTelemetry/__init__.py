@@ -1,7 +1,6 @@
 import logging
 import json
 import os
-import pyodbc
 import azure.functions as func
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
@@ -9,6 +8,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     conn = None
 
     try:
+        try:
+            import pyodbc
+        except ImportError as import_error:
+            return func.HttpResponse(
+                json.dumps({"success": False, "error": f"pyodbc import failed: {str(import_error)}"}),
+                status_code=500,
+                mimetype="application/json"
+            )
+
         data = req.get_json()
         adid = data.get('adid')
 

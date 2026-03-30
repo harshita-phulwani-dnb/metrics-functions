@@ -25,8 +25,13 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install dependencies into package folder
+        run: |
+          mkdir -p .python_packages/lib/site-packages
+          pip install -r requirements.txt --target .python_packages/lib/site-packages
+
       - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+        run: zip -r release.zip . -x venv/\* .git/\*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -51,11 +56,8 @@ jobs:
 
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
-        id: deploy-to-function
         with:
           app-name: metrics-functions
           slot-name: Production
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_838408DE49ED44CA980581A3A7303D97 }}
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true

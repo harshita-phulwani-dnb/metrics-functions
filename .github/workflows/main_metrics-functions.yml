@@ -4,36 +4,30 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'copilot-metrics-functions/**'
   workflow_dispatch:
 
-env:
-  PYTHON_VERSION: '3.11'
-
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
       contents: read
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Setup Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
+    - name: Setup Python version
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          mkdir -p .python_packages/lib/site-packages
-          pip install -r requirements.txt --target .python_packages/lib/site-packages
-
-      - name: Upload to Azure
-        uses: Azure/functions-action@v1
-        with:
-          app-name: metrics-functions
-          slot-name: Production
-          package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_838408DE49ED44CA980581A3A7303D97 }}
+    - name: Deploy to Azure Functions
+      uses: Azure/functions-action@v1
+      with:
+        app-name: 'metrics-functions'
+        package: './copilot-metrics-functions'
+        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        sku: 'flexconsumption'
+        remote-build: true

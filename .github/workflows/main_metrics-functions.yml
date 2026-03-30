@@ -26,6 +26,6 @@ jobs:
       with:
         app-name: 'metrics-functions'
         package: '.'
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_838408DE49ED44CA980581A3A7303D97 }}
         sku: 'flexconsumption'
         remote-build: true
